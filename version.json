@@ -1,6 +1,7 @@
 {
-  "version": "1.0.0-beta.5",
-  "downloadUrl": "https://github.com/liu-yanling/course-notes/releases/download/v1.0.0-beta.5/course-notes-1.0.0-beta.5.zip",
-  "notes": "course notes 1.0.0 beta.5",
-  "publishedAt": "2026-11-05"
+  "version": "1.0.0-beta.6",
+  "downloadUrl": "https://github.com/liu-yanling/course-notes/releases/download/v1.0.0-beta.6/course-notes-1.0.0-beta.6.zip",
+  "notes": "course notes 1.0.0 beta.6",
+  "publishedAt": "2026-11-05",
+  "sha256": "9a1eb5831b0870e626eb3da1a7625995c20481bd458980a129ecf789f971395c"
 }
