@@ -1,0 +1,39 @@
+{
+  "name": "dsh-video-coursemap",
+  "version": "2.1.0",
+  "description": "视频课程知识地图 Agent 2.1：macOS 前台浏览器检测、B 站内容/弹幕/评论总结、学科分类、Word 知识笔记与 DSH 新会话交付；启用 dsh-memory-evolve 记忆。",
+  "type": "module",
+  "main": "lib/index.js",
+  "license": "MIT",
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "scripts": {
+    "test": "node --test 'tests/*.test.js'",
+    "e2e": "node scripts/e2e.mjs",
+    "install": "node scripts/install.mjs"
+  },
+  "files": [
+    "lib",
+    "scripts",
+    "cordis.patch.yml",
+    "config.example.json",
+    "README.md"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/linner1224/dsh-video-coursemap"
+  },
+  "homepage": "https://github.com/linner1224/dsh-video-coursemap#readme",
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "video",
+    "bilibili",
+    "knowledge-map",
+    "course",
+    "macos"
+  ]
+}

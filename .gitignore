@@ -1,0 +1,49 @@
+# macOS
+.DS_Store
+
+# user data / runtime state
+config.json
+server/config.json
+server/runtime.json
+runtime.json
+课程知识地图/
+**/.state/
+*.docx
+*.dmg
+*.zip
+*.app
+*.app/
+Course Notes.app
+课程助手.app
+
+# build output and packaged runtimes
+dist/
+build/
+logs/
+server/logs/
+*.log
+.tmp/
+
+# secrets
+.env
+.env.*
+*.p8
+*.pem
+*.key
+
+# dependencies
+node_modules/
+
+# internal product/business notes (kept locally, not published)
+docs/产品化方案-v1.md
+docs/上线阻塞项.md
+安装课程助手.command
+回滚课程助手.command
+backups/
+
+# local-only convenience scripts / old screenshots / internal QA
+*.command
+docs/课程助手界面.png
+docs/课程助手设置.png
+docs/演示脚本.md
+docs/验收清单.md

@@ -1,0 +1,34 @@
+{
+  "name": "course-notes",
+  "version": "1.0.0",
+  "private": false,
+  "type": "module",
+  "description": "course notes · turn Bilibili courses into local knowledge notes and Word study manuals",
+  "scripts": {
+    "start": "node server/index.mjs --open",
+    "serve": "node server/index.mjs",
+    "test": "node --test 'server/tests/*.test.mjs' && node --test 'apps/dsh-video-coursemap/tests/*.test.js'",
+    "shortcut": "node scripts/install-desktop-shortcut.mjs",
+    "build:app": "node scripts/install-desktop-shortcut.mjs --dry-run"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/liu-yanling/course-notes.git"
+  },
+  "homepage": "https://github.com/liu-yanling/course-notes",
+  "bugs": {
+    "url": "https://github.com/liu-yanling/course-notes/issues"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "keywords": [
+    "bilibili",
+    "course-notes",
+    "knowledge-map",
+    "macos",
+    "deepseek",
+    "word"
+  ]
+}

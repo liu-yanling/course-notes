@@ -1,0 +1,13 @@
+{
+  "outputDir": "/Users/你的用户名/Downloads/课程助手/课程知识地图",
+  "delivery": {
+    "cwd": "/Users/你的用户名/Downloads/课程助手",
+    "newSession": true
+  },
+  "browser": {
+    "backend": "auto",
+    "chromeRecencyMinutes": 30
+  },
+  "pollIntervalMs": 15000,
+  "stablePolls": 2
+}

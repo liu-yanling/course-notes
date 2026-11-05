@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>course notes · B站课程实时知识地图</title>
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 32 32" fill="none"><path d="M7 9.5c3.4-1.3 6.4-1.1 9 0.7v14c-2.6-1.8-5.6-2-9-.7v-14Z" fill="white"/><path d="M25 9.5c-3.4-1.3-6.4-1.1-9 0.7v14c2.6-1.8 5.6-2 9-.7v-14Z" fill="white" opacity=".82"/><circle cx="25.5" cy="7" r="3.2" fill="#fbbf24"/></svg>
+      </div>
+      <div>
+        <div class="brand-name">course notes</div>
+        <div class="brand-sub">B站课程 · 实时知识地图</div>
+      </div>
+    </div>
+    <nav class="sidebar-nav" aria-label="主导航">
+      <button class="nav-item active" data-view="home" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m4 10 8-6 8 6v9a1 1 0 0 1-1 1h-5v-6H10v6H5a1 1 0 0 1-1-1v-9Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg><span>主页</span></button>
+      <button class="nav-item" data-view="library" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4.5h11.5A2.5 2.5 0 0 1 19 7v12.5H7.5A2.5 2.5 0 0 1 5 17V4.5Z" stroke="currentColor" stroke-width="1.7"/><path d="M5 17a2.5 2.5 0 0 1 2.5-2.5H19" stroke="currentColor" stroke-width="1.7"/><path d="M9 8h6M9 11h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><span>学习档案</span></button>
+      <button class="nav-item" id="btnSettingsNav" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15.2a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4Z" stroke="currentColor" stroke-width="1.7"/><path d="M19.4 13.2c.1-.4.1-.8.1-1.2s0-.8-.1-1.2l2-1.5-2-3.4-2.4 1a7.1 7.1 0 0 0-2-1.2L14.6 3h-4l-.4 2.7c-.7.3-1.4.7-2 1.2l-2.4-1-2 3.4 2 1.5c-.1.4-.1.8-.1 1.2s0 .8.1 1.2l-2 1.5 2 3.4 2.4-1c.6.5 1.3.9 2 1.2l.4 2.7h4l.4-2.7c.7-.3 1.4-.7 2-1.2l2.4 1 2-3.4-2-1.5Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg><span>设置</span></button>
+    </nav>
+    <div class="sidebar-recent">
+      <div class="sidebar-label">最近学习</div>
+      <div id="sidebarRecent" class="recent-list"><div class="muted tiny">还没有记录</div></div>
+    </div>
+    <div class="sidebar-footer">
+      <div class="sidebar-status"><span id="sidebarDot" class="dot"></span><span id="sidebarStatus">连接中…</span></div>
+      <div class="tiny muted" id="sidebarVersion">course notes · beta</div>
+    </div>
+  </aside>
+
+  <div class="workspace">
+    <header class="topbar">
+      <div class="page-heading">
+        <h1 id="pageTitle">主页</h1>
+        <p id="pageSubtitle">检测当前 B 站课程，自动生成学科知识地图</p>
+      </div>
+      <div class="topbar-actions">
+        <span id="statusPill" class="status-pill"><span class="dot"></span><span id="statusText">连接中…</span></span>
+        <label class="switch" title="启动/暂停轮询"><input id="masterSwitch" type="checkbox" role="switch" aria-label="启动轮询"><span class="switch-track"><span class="switch-thumb"></span></span></label>
+        <button id="btnPollNow" class="btn btn-primary" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5V3M12 21v-2M5 12H3M21 12h-2M6.3 6.3 4.9 4.9M19.1 19.1l-1.4-1.4M17.7 6.3l1.4-1.4M4.9 19.1l1.4-1.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="12" r="3.2" stroke="currentColor" stroke-width="1.8"/></svg>立即检测</button>
+        <button id="btnSettings" class="btn btn-ghost icon-btn" type="button" aria-label="设置"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15.2a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4Z" stroke="currentColor" stroke-width="1.8"/><path d="M19.4 13.2c.1-.4.1-.8.1-1.2s0-.8-.1-1.2l2-1.5-2-3.4-2.4 1a7.1 7.1 0 0 0-2-1.2L14.6 3h-4l-.4 2.7c-.7.3-1.4.7-2 1.2l-2.4-1-2 3.4 2 1.5c-.1.4-.1.8-.1 1.2s0 .8.1 1.2l-2 1.5 2 3.4 2.4-1c.6.5 1.3.9 2 1.2l.4 2.7h4l.4-2.7c.7-.3 1.4-.7 2-1.2l2.4 1 2-3.4-2-1.5Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg></button>
+      </div>
+    </header>
+
+    <div id="offlineBanner" class="offline-banner" hidden><span class="spinner small"></span> 服务连接中… 如果长时间无响应，请重新启动 course notes。</div>
+
+    <main id="viewHome" class="view">
+      <section class="hero">
+        <div class="hero-copy">
+          <span class="eyebrow">自动检测 · 实时总结</span>
+          <h2>把正在看的 B 站课程，<br>变成可复习的知识笔记。</h2>
+          <p>打开课程保持前台，course notes 会自动识别、抓取弹幕与评论，并生成 Word 学习笔记。</p>
+        </div>
+        <form id="heroForm" class="hero-form">
+          <input id="heroUrl" type="text" placeholder="粘贴 B 站视频链接，或输入课程标题…" autocomplete="off">
+          <button class="btn btn-primary" type="submit">开始总结</button>
+        </form>
+        <div class="hero-hints"><span>支持 Chrome / Safari / Tabbit</span><span>本地优先 · 笔记留在本机</span><span>DeepSeek / Ollama / 本地提取</span></div>
+      </section>
+
+      <div class="dashboard-grid">
+        <section class="column">
+          <section class="panel monitor-panel">
+            <div class="panel-head"><div><h2>检测器</h2><p class="sub">定时观察当前前台浏览器</p></div><span id="pollBadge" class="mini-badge">待启动</span></div>
+            <div class="current-card">
+              <div class="current-row"><span class="label">当前窗口</span><span id="frontApp" class="value strong">—</span></div>
+              <div class="current-video"><div id="currentTitle" class="video-title">还没有检测到 B 站视频</div><a id="currentUrl" class="video-url" href="#" target="_blank" rel="noreferrer" hidden></a></div>
+              <div class="current-meta"><span id="currentSource" class="chip">来源：—</span><span id="currentTime" class="muted tiny">最后观察：—</span></div>
+            </div>
+            <div class="countdown-row">
+              <div class="ring-wrap"><svg class="ring" viewBox="0 0 80 80" aria-hidden="true"><circle class="ring-bg" cx="40" cy="40" r="32"></circle><circle id="ringProgress" class="ring-fg" cx="40" cy="40" r="32"></circle></svg><div class="ring-label"><strong id="nextPoll">—</strong><span>下次轮询</span></div></div>
+              <div class="countdown-copy"><div class="interval-line"><span>间隔</span><strong id="intervalLabel">15 秒</strong></div><div class="muted tiny" id="lastPollTime">尚未轮询</div><div class="muted tiny" id="stableLabel">连续确认 2 次</div></div>
+            </div>
+            <div class="control-block">
+              <div class="control-line"><label for="intervalRange">轮询间隔</label><div class="interval-input"><input id="intervalRange" type="range" min="3" max="120" step="1" value="15"><input id="intervalNumber" type="number" min="3" max="120" step="1" value="15" aria-label="轮询间隔秒数"><span class="unit">秒</span></div></div>
+              <div class="preset-row" id="intervalPresets"><button type="button" data-sec="5">5s</button><button type="button" data-sec="10">10s</button><button type="button" data-sec="15" class="active">15s</button><button type="button" data-sec="30">30s</button><button type="button" data-sec="60">60s</button></div>
+              <div class="control-line compact"><label for="stablePolls">连续确认</label><div class="stepper-inline"><button type="button" data-stable="-1" aria-label="减少">−</button><input id="stablePolls" type="number" min="1" max="5" step="1" value="2"><button type="button" data-stable="1" aria-label="增加">+</button><span class="unit">次</span></div></div>
+            </div>
+          </section>
+          <section class="panel poll-panel">
+            <div class="panel-head"><div><h2>最近轮询</h2><p class="sub">每次检测的时间与判定</p></div><button id="btnClearPolls" class="text-btn" type="button">清空</button></div>
+            <div id="pollList" class="poll-list" aria-live="polite"><div class="empty small">还没有轮询记录</div></div>
+          </section>
+        </section>
+
+        <section class="panel summary-panel">
+          <div class="panel-head"><div><h2>实时知识总结</h2><p class="sub">检测 → 分类 → 抓取 → 总结 → Word</p></div><span id="taskBadge" class="mini-badge">待命</span></div>
+          <div id="stepper" class="stepper" aria-label="任务进度">
+            <div class="step" data-step="classify"><span class="step-dot">1</span><span>分类</span></div>
+            <div class="step" data-step="fetch"><span class="step-dot">2</span><span>抓取</span></div>
+            <div class="step" data-step="summarize"><span class="step-dot">3</span><span>总结</span></div>
+            <div class="step" data-step="docs"><span class="step-dot">4</span><span>生成 Word</span></div>
+            <div class="step" data-step="done"><span class="step-dot">✓</span><span>完成</span></div>
+          </div>
+          <div class="progress-track"><div id="taskProgress" class="progress-fill"></div></div>
+
+          <div id="summaryEmpty" class="empty-state">
+            <div class="empty-illustration" aria-hidden="true"><svg viewBox="0 0 120 80"><rect x="14" y="12" width="92" height="58" rx="10" fill="#fff6e8"/><path d="M34 30h24M34 40h18M34 50h28" stroke="#e7b88a" stroke-width="3" stroke-linecap="round"/><circle cx="92" cy="26" r="10" fill="#4f46e5" opacity=".9"/><path d="M88 26h8M92 22v8" stroke="white" stroke-width="2.4" stroke-linecap="round"/></svg></div>
+            <h3>还没有正在总结的视频</h3><p>打开 B 站课程并保持前台，或在上方粘贴视频链接。</p>
+          </div>
+
+          <div id="summaryContent" hidden>
+            <div class="video-head">
+              <div class="cover-wrap"><img id="summaryCover" class="cover" alt="" hidden><div id="summaryCoverFallback" class="cover-fallback">▶</div></div>
+              <div class="video-head-main"><h3 id="taskTitle">—</h3><p id="taskStatus" class="muted">—</p><div id="summaryKeywords" class="keyword-row"></div><div id="summaryMeta" class="summary-meta"></div></div>
+            </div>
+            <div class="summary-tabs" id="summaryTabs" role="tablist"><button type="button" class="active" data-tab="summary">总结</button><button type="button" data-tab="mindmap">思维导图</button><button type="button" data-tab="insights">弹幕 / 评论</button></div>
+            <div id="summaryMarkdown" class="markdown" aria-live="polite"></div>
+            <div class="doc-actions"><button id="btnOpenDoc" class="btn btn-primary" type="button" disabled>打开 Word</button><button id="btnDownloadDoc" class="btn btn-ghost" type="button" disabled>下载</button><button id="btnCopySummary" class="btn btn-ghost" type="button">复制总结</button><button id="btnOpenDir" class="btn btn-ghost" type="button">打开目录</button></div>
+          </div>
+
+          <form id="manualForm" class="manual-form"><label for="manualUrl">手动总结一个视频</label><div class="manual-row"><input id="manualUrl" type="text" placeholder="粘贴 B 站视频 URL，或输入标题" autocomplete="off"><button class="btn btn-ghost" type="submit">开始总结</button></div></form>
+        </section>
+      </div>
+    </main>
+
+    <main id="viewLibrary" class="view" hidden>
+      <section class="library-head"><div class="library-stats" id="libraryStats"></div></section>
+      <section class="panel library-panel">
+        <div class="panel-head"><div class="history-tabs" id="historyTabs"><button type="button" class="active" data-tab="videos">视频</button><button type="button" data-tab="subjects">学科</button></div><input id="historySearch" type="search" placeholder="搜索标题、学科或关键词…" autocomplete="off"></div>
+        <div id="historyList" class="history-list"><div class="empty small">还没有学习记录</div></div>
+      </section>
+    </main>
+
+    <footer class="footer"><span>course notes · 独立版 v1.0.0</span><span id="footerPort">本机服务</span></footer>
+  </div>
+</div>
+
+<div id="settingsBackdrop" class="drawer-backdrop" hidden></div>
+<aside id="settingsDrawer" class="drawer" aria-label="设置" aria-hidden="true">
+  <div class="drawer-head"><div><h2>设置</h2><p class="sub">轮询、模型与桌面快捷方式</p></div><button id="settingsClose" class="btn btn-ghost icon-btn" type="button" aria-label="关闭设置">×</button></div>
+  <div class="drawer-body">
+    <section class="settings-group"><h3>轮询</h3><label class="field"><span>间隔（秒）</span><input id="setInterval" type="number" min="3" max="120" step="1"></label><label class="field"><span>连续确认次数</span><input id="setStable" type="number" min="1" max="5" step="1"></label><label class="field"><span>检测后端</span><select id="setBackend"><option value="auto">自动（推荐）</option><option value="tabbit">Tabbit 当前标签页</option><option value="chromium">Chromium 历史近似</option><option value="applescript">AppleScript</option><option value="manual">仅手动</option></select></label><label class="check-line"><input id="setAutoStart" type="checkbox"> 服务启动后自动开始轮询</label></section>
+    <section class="settings-group"><h3>LLM</h3><label class="field"><span>Provider</span><select id="llmProvider"><option value="deepseek">DeepSeek API（推荐）</option><option value="ollama">本地 Ollama</option><option value="local">本地提取（无 LLM）</option></select></label><label class="field"><span>模型</span><input id="llmModel" type="text" placeholder="deepseek-chat"></label><label class="field"><span>Base URL</span><input id="llmBaseUrl" type="text" placeholder="https://api.deepseek.com/v1"></label><label class="field"><span>自定义 Key（保存到 Keychain）</span><input id="llmApiKey" type="password" placeholder="输入后保存，不会写入配置明文" autocomplete="off"></label><div class="inline-actions"><button id="btnTestLlm" class="btn btn-ghost" type="button">测试连接</button><span id="llmKeyStatus" class="muted small-text">—</span></div><p class="hint">Key 只保存在 macOS Keychain；页面和日志不显示原文。</p></section>
+    <section class="settings-group"><h3>数据与桌面</h3><label class="field"><span>数据目录</span><input id="setDataDir" type="text" placeholder="~/Documents/course notes"></label><p class="hint">当前：<code id="outputDir">—</code></p><label class="check-line"><input id="notifyOnComplete" type="checkbox"> 总结完成后显示系统通知</label><label class="check-line"><input id="autostart" type="checkbox"> 开机自启（菜单栏）</label><p id="autostartStatus" class="hint">—</p><button id="btnShortcut" class="btn btn-ghost wide" type="button">创建桌面快捷方式</button><p id="shortcutStatus" class="hint">—</p><p class="hint">桌面快捷方式启动的是独立服务，不需要打开 DeepSeek Harness。</p></section>
+    <section class="settings-group"><h3>关于与更新</h3><div class="update-row"><span>当前版本 <strong id="updateCurrent">v—</strong></span><button id="btnCheckUpdate" class="btn btn-ghost" type="button">检查更新</button></div><p id="updateStatus" class="hint">内测版尚未配置更新地址。</p><button id="updateDownload" class="btn btn-primary wide" type="button" hidden>下载新版本</button><label class="field" style="margin-top:12px"><span>更新清单 URL（可选）</span><input id="updateUrl" type="text" placeholder="https://…/version.json"></label><p class="hint">清单格式：version / downloadUrl / notes。留空则关闭更新检查。</p></section>
+    <section class="settings-group"><h3>服务</h3><button id="btnShutdown" class="btn btn-danger wide" type="button">停止服务</button></section>
+  </div>
+  <div class="drawer-foot"><button id="settingsCancel" class="btn btn-ghost" type="button">取消</button><button id="btnSaveSettings" class="btn btn-primary" type="button">保存设置</button></div>
+</aside>
+
+<div id="onboarding" class="onboarding" hidden>
+  <div class="onboarding-card">
+    <div class="onboarding-head"><div class="onboarding-mark">✦</div><div><h2>欢迎使用 course notes</h2><p>把正在看的 B 站课程，变成可复习的知识笔记。</p></div></div>
+    <div class="onboarding-steps"><span data-onboard-dot="1" class="active">1 数据目录</span><span data-onboard-dot="2">2 连接模型</span><span data-onboard-dot="3">3 浏览权限</span></div>
+    <section id="onboardStep1" class="onboard-step">
+      <h3>先决定笔记放在哪里</h3><p class="onboard-desc">视频笔记、Word 和学科手册都会保存在这里。默认在「文稿」下，之后可以在设置中修改。</p>
+      <label class="field"><span>数据目录</span><input id="onboardDataDir" type="text" placeholder="~/Documents/course notes"></label>
+      <div class="onboard-actions"><span></span><button id="onboardNext1" class="btn btn-primary" type="button">下一步</button></div>
+    </section>
+    <section id="onboardStep2" class="onboard-step" hidden>
+      <h3>连接你的模型</h3><p class="onboard-desc">推荐用自己的 DeepSeek Key；没有 Key 也可以先用「本地提取」。</p>
+      <label class="field"><span>Provider</span><select id="onboardProvider"><option value="deepseek">DeepSeek API</option><option value="ollama">本地 Ollama</option><option value="local">本地提取（无 LLM）</option></select></label>
+      <label class="field"><span>DeepSeek Key</span><input id="onboardKey" type="password" placeholder="sk-… 保存到 macOS Keychain" autocomplete="off"></label>
+      <div class="inline-actions"><button id="onboardSaveKey" class="btn btn-ghost" type="button">保存并测试</button><span id="onboardKeyStatus" class="muted small-text">—</span></div>
+      <div class="onboard-actions"><button id="onboardSkipLlm" class="text-btn" type="button">先用本地提取</button><button id="onboardNext2" class="btn btn-primary" type="button">下一步</button></div>
+    </section>
+    <section id="onboardStep3" class="onboard-step" hidden>
+      <h3>让 course notes 看到你正在看的课程</h3><p class="onboard-desc">首次在 Chrome / Safari 读取当前标签页时，macOS 会请求「自动化」权限。允许后就能自动检测课程；拒绝也不影响手动粘贴链接。</p>
+      <div class="permission-note">系统设置 → 隐私与安全性 → 自动化 → 允许 course notes 控制 Chrome / Safari</div>
+      <div class="onboard-actions"><button id="onboardOpenPrivacy" class="text-btn" type="button">打开系统设置</button><button id="onboardFinish" class="btn btn-primary" type="button">开始使用</button></div>
+    </section>
+    <div class="onboard-foot"><button id="onboardSkipAll" class="text-btn" type="button">跳过引导</button><span>数据只保存在本机</span></div>
+  </div>
+</div>
+<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+<script src="/app.js"></script>
+</body>
+</html>

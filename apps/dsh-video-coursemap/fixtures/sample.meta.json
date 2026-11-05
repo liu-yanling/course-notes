@@ -1,0 +1,20 @@
+{
+  "kind": "video",
+  "title": "测试视频：机器学习入门",
+  "subject": "人工智能",
+  "owner": "测试UP",
+  "bvid": "BV1xx411c7mD",
+  "url": "https://www.bilibili.com/video/BV1xx411c7mD",
+  "date": "2026-11-05",
+  "generatedAt": "2026-11-05 16:40:00",
+  "coverage": "视频简介 · 弹幕 10 条 · 热评 3 条",
+  "keywords": [
+    "机器学习",
+    "监督学习",
+    "过拟合"
+  ],
+  "stats": {
+    "view": 1000,
+    "like": 50
+  }
+}

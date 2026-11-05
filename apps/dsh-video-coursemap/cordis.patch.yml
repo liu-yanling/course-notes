@@ -1,0 +1,6 @@
+# dsh-video-coursemap bundle patch：把 host 插件行插入 profile 的插件清单。
+# 用 install.mjs 覆盖 profile 里的市场版后，重启 DSH 加载；不要把同一 id
+# 再次 insert 到 profile 的 cordis.patch.yml（duplicate loader id 会报错）。
+- insert:
+    - id: dsh-video-coursemap
+      name: 'dsh-video-coursemap'
