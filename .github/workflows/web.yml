@@ -1,0 +1,33 @@
+name: web
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build web image
+        run: docker build -f Dockerfile.web -t course-notes-web .
+      - name: Start container
+        run: |
+          docker run -d --name course-notes-web -p 43210:10000 course-notes-web
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:43210/healthz; then exit 0; fi
+            sleep 1
+          done
+          echo "health check failed"
+          docker logs course-notes-web
+          exit 1
+      - name: Verify static page
+        run: curl -fsS http://127.0.0.1:43210/ | grep -q "course notes"
+      - name: Show logs
+        if: always()
+        run: docker logs course-notes-web || true
+      - name: Cleanup
+        if: always()
+        run: docker rm -f course-notes-web || true

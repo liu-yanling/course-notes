@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>course notes · Web 内测</title>
+<meta name="description" content="粘贴 B 站课程链接，生成可复习的结构化知识笔记。">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="top">
+  <a class="brand" href="/"><span class="mark">✦</span><span>course notes</span><em>Web 内测</em></a>
+  <div class="top-links"><a href="https://github.com/liu-yanling/course-notes" target="_blank" rel="noreferrer">GitHub</a><span>无需登录 · 不保存视频</span></div>
+</header>
+
+<main>
+  <section class="hero">
+    <span class="eyebrow">B 站课程 · 在线生成</span>
+    <h1>粘贴一个链接，<br>换回一份<strong>能复习的笔记</strong>。</h1>
+    <p class="lead">抓取视频简介、分P、标签、弹幕与评论，生成结构化知识笔记和思维导图。Web 版是手动粘贴模式；本地 macOS 版支持自动检测当前标签页。</p>
+    <form id="form" class="form">
+      <div class="url-row">
+        <input id="url" type="text" placeholder="https://www.bilibili.com/video/BV…" autocomplete="off" spellcheck="false">
+        <button id="submit" class="primary" type="submit">生成笔记</button>
+      </div>
+      <label class="key-row"><span>DeepSeek Key（可选）</span><input id="key" type="password" placeholder="留空则使用本地提取，质量较低" autocomplete="off"></label>
+      <p class="privacy">Key 只随本次请求发送，不存储、不写入日志。不用 Key 时也能生成基础笔记。</p>
+    </form>
+  </section>
+
+  <section id="progress" class="panel progress" hidden>
+    <div class="progress-head"><span class="spinner"></span><strong id="progressTitle">正在处理</strong><span id="progressSub">读取视频信息…</span></div>
+    <div class="steps"><span data-step="fetch">抓取</span><span data-step="classify">分类</span><span data-step="summarize">总结</span><span data-step="done">完成</span></div>
+  </section>
+
+  <section id="error" class="panel error" hidden><strong>生成失败</strong><p id="errorText"></p></section>
+
+  <section id="result" class="panel result" hidden>
+    <div class="result-head">
+      <div><span id="mode" class="mode">本地提取</span><h2 id="title">—</h2><p id="meta"></p></div>
+      <div class="result-actions"><button id="copy" class="ghost" type="button">复制 Markdown</button><button id="markdown" class="ghost" type="button">下载 .md</button><button id="docx" class="primary small" type="button">下载 Word</button></div>
+    </div>
+    <div id="warning" class="warning" hidden></div>
+    <div class="tabs" id="tabs"><button class="active" data-tab="summary" type="button">总结</button><button data-tab="mindmap" type="button">思维导图</button></div>
+    <article id="markdownBody" class="markdown"></article>
+    <div class="source">来源：B 站公开视频信息 · 笔记由 AI/本地提取生成，请以原视频为准</div>
+  </section>
+
+  <section class="features">
+    <div><b>01</b><h3>手动粘贴</h3><p>Web 版不读取浏览器标签页；打开 B 站视频复制链接即可。</p></div>
+    <div><b>02</b><h3>结构化笔记</h3><p>学习目标、核心知识点、术语、弹幕洞察、复习清单。</p></div>
+    <div><b>03</b><h3>可带走</h3><p>下载 Markdown 或 Word，继续在本地编辑。</p></div>
+  </section>
+
+  <section class="faq">
+    <h2>说明</h2>
+    <details><summary>Web 版和 macOS 版有什么区别？</summary><p>Web 版手动粘贴链接、结果不落盘；macOS 版自动检测前台课程、保存本地笔记、生成学科手册，并支持菜单栏/开机自启。</p></details>
+    <details><summary>我的视频会上传吗？</summary><p>不会。只抓取 B 站公开的文字信息；视频本身不经过本服务。总结文本会发送给你选择的 LLM（DeepSeek）。</p></details>
+    <details><summary>为什么没有字幕也能总结？</summary><p>会结合简介、分P、标签、弹幕与评论；有字幕时信息更完整。结果是学习辅助，不保证覆盖全部内容。</p></details>
+  </section>
+</main>
+
+<footer class="foot"><span>course notes · Web MVP</span><a href="https://liu-yanling.github.io/course-notes/" target="_blank" rel="noreferrer">官网 / macOS 版</a><a href="https://github.com/liu-yanling/course-notes" target="_blank" rel="noreferrer">开源</a></footer>
+<script src="app.js"></script>
+</body>
+</html>

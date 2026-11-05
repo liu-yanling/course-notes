@@ -31,12 +31,31 @@ agent runtime running.
 - **Retry & recovery** — failed tasks persist with backoff and can be retried manually after a restart.
 - **Permission probe** — test the active Chrome/Safari/Tabbit tab and jump to macOS Automation settings.
 - **Website** — [liu-yanling.github.io/course-notes](https://liu-yanling.github.io/course-notes/); source in [site/](site/).
+- **Web MVP** — stateless manual-URL summarizer in web/; deployable on Render via Dockerfile.web + render.yaml.
 
 ## Status
 
 1.0.0-beta · Apple Silicon macOS · ad-hoc signed, **not notarized**.
 The source is MIT-licensed. Binary beta builds are published in
 [GitHub Releases](https://github.com/liu-yanling/course-notes/releases).
+
+## Web MVP (Render)
+
+![course notes Web MVP](docs/course-notes-web.png)
+
+A separate, stateless web edition: paste a Bilibili URL, get a Markdown note
+and Word download. No browser detection, no local files, no accounts.
+
+- Source: [web/](web/)
+- Docker: [Dockerfile.web](Dockerfile.web)
+- Render blueprint: [render.yaml](render.yaml)
+- One-click deploy: https://render.com/deploy?repo=https://github.com/liu-yanling/course-notes
+
+Local preview:
+
+~~~sh
+PORT=43210 node web/server.mjs
+~~~
 
 ## Quick start (from source)
 
