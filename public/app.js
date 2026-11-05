@@ -99,6 +99,7 @@
       'taskBadge', 'stepper', 'taskProgress', 'summaryEmpty', 'summaryContent',
       'taskTitle', 'taskStatus', 'summaryKeywords', 'summaryMeta', 'summaryMarkdown',
       'summaryCover', 'summaryCoverFallback', 'summaryTabs', 'btnCopySummary',
+      'retryBox', 'retryText', 'retryCountdown', 'btnRetryNow', 'btnRetryClear',
       'btnOpenDoc', 'btnDownloadDoc', 'btnOpenDir', 'manualForm', 'manualUrl',
       'historyTabs', 'historySearch', 'historyList', 'libraryStats',
       'settingsBackdrop', 'settingsDrawer', 'settingsClose', 'settingsCancel',
@@ -107,7 +108,7 @@
       'llmKeyStatus', 'btnTestLlm', 'btnShortcut', 'shortcutStatus', 'btnShutdown',
       'outputDir', 'btnSaveSettings', 'toast', 'footerPort', 'setDataDir', 'notifyOnComplete',
       'updateCurrent', 'updateStatus', 'btnCheckUpdate', 'updateDownload', 'updateUrl',
-      'autostart', 'autostartStatus', 'browserHint', 'btnBrowserPermission',
+      'autostart', 'autostartStatus', 'browserHint', 'btnBrowserPermission', 'btnProbeBrowser',
       'onboarding', 'onboardStep1', 'onboardStep2', 'onboardStep3', 'onboardDataDir',
       'onboardNext1', 'onboardProvider', 'onboardKey', 'onboardSaveKey', 'onboardKeyStatus',
       'onboardSkipLlm', 'onboardNext2', 'onboardOpenPrivacy', 'onboardFinish', 'onboardSkipAll'
@@ -139,6 +140,25 @@
       });
       renderSummary();
     });
+    els.btnRetryNow.addEventListener('click', async function () {
+      els.btnRetryNow.disabled = true;
+      try {
+        await postJson('/api/retry', { action: 'now' });
+        toast('已开始重试', 'success');
+      } catch (error) {
+        toast(error.message, 'error');
+      } finally {
+        els.btnRetryNow.disabled = false;
+      }
+    });
+    els.btnRetryClear.addEventListener('click', async function () {
+      try {
+        await postJson('/api/retry', { action: 'clear' });
+        toast('已忽略这次失败', 'success');
+      } catch (error) {
+        toast(error.message, 'error');
+      }
+    });
     els.btnCopySummary.addEventListener('click', function () {
       if (!state.summary) return;
       navigator.clipboard.writeText(state.summary).then(function () {
@@ -151,6 +171,25 @@
     els.btnSaveSettings.addEventListener('click', saveSettings);
     els.btnTestLlm.addEventListener('click', testLlm);
     els.btnCheckUpdate.addEventListener('click', checkUpdate);
+    els.btnProbeBrowser.addEventListener('click', async function () {
+      els.btnProbeBrowser.disabled = true;
+      try {
+        var data = await postJson('/api/browser/probe', {});
+        if (data.ok) {
+          els.browserHint.textContent = data.title ? '已读取当前标签页：' + data.title : '已读取当前标签页。';
+          toast(data.url && /bilibili\.com\/video/.test(data.url) ? '当前是 B 站视频，检测可用' : '当前标签页已读取，但不是 B 站视频', data.url && /bilibili\.com\/video/.test(data.url) ? 'success' : '');
+        } else {
+          els.browserHint.textContent = data.permissionDenied
+            ? '权限被拒绝。打开系统设置 → 隐私与安全性 → 自动化，允许 course notes 控制浏览器。'
+            : (data.error || '无法读取当前标签页，请使用 Chrome/Safari 或手动 URL。');
+          toast(els.browserHint.textContent, 'error');
+        }
+      } catch (error) {
+        toast(error.message, 'error');
+      } finally {
+        els.btnProbeBrowser.disabled = false;
+      }
+    });
     els.btnBrowserPermission.addEventListener('click', function () {
       postJson('/api/open-url', { url: 'x-apple.systempreferences:com.apple.preference.security?Privacy_Automation' })
         .catch(function (error) { toast(error.message, 'error'); });
@@ -839,11 +878,24 @@
     els.footerPort.textContent = status.port ? '本机服务 :' + status.port : '本机服务';
     if (state.config) els.outputDir.textContent = state.config.outputDir || '—';
     if (status.lastError) state.lastError = status.lastError;
+    renderRetry(status.retry);
     if (els.sidebarStatus) {
       els.sidebarStatus.textContent = !connected ? '离线' : working ? '总结中' : enabled ? '运行中' : '已暂停';
       els.sidebarDot.className = 'dot ' + (!connected ? 'offline' : working ? 'working' : enabled ? 'running' : 'paused');
     }
     tickCountdown();
+  }
+
+  function renderRetry(info) {
+    if (!els.retryBox) return;
+    if (!info) {
+      els.retryBox.hidden = true;
+      return;
+    }
+    els.retryBox.hidden = false;
+    els.retryText.textContent = '“' + (info.title || '当前任务') + '”失败：' + (info.error || '未知错误') + '（第 ' + info.attempts + '/' + (info.maxAttempts || 3) + ' 次）';
+    var remain = Math.max(0, Number(info.nextAt || 0) - Date.now());
+    els.retryCountdown.textContent = remain > 0 ? '将在 ' + Math.ceil(remain / 1000) + ' 秒后自动重试' : '等待重试';
   }
 
   function sourceLabel(source) {
@@ -886,6 +938,10 @@
       els.nextPoll.textContent = '—';
       els.ringProgress.style.strokeDashoffset = '201';
       return;
+    }
+    if (state.status && state.status.retry) {
+      var retryRemain = Math.max(0, Number(state.status.retry.nextAt || 0) - Date.now());
+      if (els.retryCountdown) els.retryCountdown.textContent = retryRemain > 0 ? '将在 ' + Math.ceil(retryRemain / 1000) + ' 秒后自动重试' : '等待重试';
     }
     var remain = Math.max(0, next - Date.now());
     els.nextPoll.textContent = remain > 0 ? (remain / 1000).toFixed(1) + 's' : '即将';

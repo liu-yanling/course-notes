@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { detectOnce, parseTabbitInventory, parseAppleScriptResult, isBrowserApp, chromiumVendorFor } from '../lib/browser.js'
+import { detectOnce, parseTabbitInventory, parseAppleScriptResult, isBrowserApp, isTabbitApp, chromiumVendorFor } from '../lib/browser.js'
 
 test('parseTabbitInventory chooses the active tab', () => {
   const stdout = [
@@ -73,4 +73,13 @@ test('detectOnce falls back to Chromium History when AppleScript is denied', asy
   })
   assert.equal(result.source, 'chromium-history')
   assert.match(result.url, /BV1owrpYKEtP/)
+})
+
+
+test('localized macOS browser names are recognized', () => {
+  assert.equal(isTabbitApp('Tabbit浏览器'), true)
+  assert.equal(isBrowserApp('Tabbit浏览器'), true)
+  assert.equal(isBrowserApp('谷歌浏览器'), true)
+  assert.equal(chromiumVendorFor('谷歌浏览器').label, 'Chrome')
+  assert.equal(isBrowserApp('Finder'), false)
 })

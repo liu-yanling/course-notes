@@ -22,9 +22,11 @@ import { createEventHub } from './events.mjs'
 import { createPipeline } from './pipeline.mjs'
 import { buildHistory, getVideoDetail } from './history.mjs'
 import {
+  browserDiagnostics,
   detectOnce,
   frontmostApp,
   isBrowserApp,
+  probeBrowser,
 } from '../apps/dsh-video-coursemap/lib/browser.js'
 import {
   ensureLayout,
@@ -38,6 +40,7 @@ import { keyStatus, listOllamaModels, testLlm } from './llm.mjs'
 import { deleteKeychainKey, setKeychainKey } from './keychain.mjs'
 import { notifyComplete } from './notify.mjs'
 import { checkForUpdate } from './update.mjs'
+import { clearRetry, readRetry, retryDelay, writeRetry, MAX_RETRY_ATTEMPTS } from './retry.mjs'
 import { autostartStatus, installAutostart, removeAutostart } from './autostart.mjs'
 import { desktopShortcutStatus, installDesktopShortcut } from './shortcut.mjs'
 
@@ -121,6 +124,8 @@ export function createAppServer(options = {}) {
   let frontApp = ''
   let lastError = ''
   let lastPoll = null
+  let retry = readRetry(join(paths.stateDir, 'retry.json'))
+  let retryTimer = null
   let actualPort = 0
   let httpServer = null
   let shuttingDown = false
@@ -220,6 +225,13 @@ export function createAppServer(options = {}) {
       task: currentTask,
       lastPoll,
       lastError,
+      retry: retry ? {
+        title: retry.observation?.title ?? '',
+        attempts: retry.attempts,
+        nextAt: retry.nextAt,
+        error: retry.error,
+        maxAttempts: MAX_RETRY_ATTEMPTS,
+      } : null,
       outputDir: config.outputDir,
       port: actualPort || config.server.port,
       subjects: Object.keys(state.subjects ?? {}).length,
@@ -357,6 +369,80 @@ export function createAppServer(options = {}) {
     return { ok: true, task: true }
   }
 
+  function retryPath() {
+    return join(paths.stateDir, 'retry.json')
+  }
+
+  function clearRetryState({ notify = true } = {}) {
+    if (retryTimer) clearTimeout(retryTimer)
+    retryTimer = null
+    retry = null
+    clearRetry(retryPath())
+    if (notify) broadcastStatus()
+  }
+
+  function armRetryTimer(delay) {
+    if (retryTimer) clearTimeout(retryTimer)
+    retryTimer = null
+    if (!retry) return
+    retryTimer = setTimeout(() => {
+      retryTimer = null
+      runRetry().catch((error) => {
+        lastError = String(error?.message ?? error)
+        emit({ type: 'error', scope: 'retry', message: lastError, at: Date.now() })
+      })
+    }, Math.max(0, Number(delay) || 0))
+    retryTimer.unref?.()
+  }
+
+  function scheduleRetry(observation, error) {
+    if (shuttingDown) return
+    const attempts = (retry?.attempts ?? 0) + 1
+    if (attempts > MAX_RETRY_ATTEMPTS) {
+      const message = '自动重试已达上限：' + String(error ?? '任务失败')
+      clearRetryState({ notify: false })
+      lastError = message
+      emit({ type: 'retry', state: 'exhausted', attempts, message, at: Date.now() })
+      broadcastStatus()
+      return
+    }
+    const nextAt = Date.now() + retryDelay(attempts)
+    retry = {
+      observation,
+      attempts,
+      nextAt,
+      error: String(error ?? '任务失败'),
+      at: Date.now(),
+    }
+    writeRetry(retryPath(), retry)
+    emit({
+      type: 'retry',
+      state: 'scheduled',
+      attempts,
+      maxAttempts: MAX_RETRY_ATTEMPTS,
+      nextAt,
+      title: observation.title,
+      message: '任务失败，将在 ' + Math.round(retryDelay(attempts) / 1000) + ' 秒后重试',
+      at: Date.now(),
+    })
+    armRetryTimer(nextAt - Date.now())
+    broadcastStatus()
+  }
+
+  async function runRetry() {
+    if (!retry || shuttingDown) return
+    if (busy) {
+      armRetryTimer(5000)
+      return
+    }
+    const observation = retry.observation
+    try {
+      await runTask(observation, { force: true, retry: true })
+    } catch (error) {
+      lastError = String(error?.message ?? error)
+    }
+  }
+
   async function runTask(observation, opts = {}) {
     if (busy) {
       const error = new Error('已有任务正在运行')
@@ -375,8 +461,21 @@ export function createAppServer(options = {}) {
     broadcastStatus()
     try {
       const result = await pipeline.runTask(observation, opts)
-      if (result && result.ok === false && result.error) lastError = result.error
+      if (result && result.ok === false) {
+        lastError = result.error || '任务失败'
+        scheduleRetry(observation, lastError)
+      } else if (result && result.docxError) {
+        lastError = result.docxError
+        scheduleRetry(observation, 'Word 生成失败：' + result.docxError)
+      } else {
+        lastError = ''
+        if (retry) clearRetryState({ notify: false })
+      }
       return result
+    } catch (error) {
+      lastError = String(error?.message ?? error)
+      scheduleRetry(observation, lastError)
+      throw error
     } finally {
       busy = false
       broadcastStatus()
@@ -386,6 +485,7 @@ export function createAppServer(options = {}) {
   function startPolling() {
     if (!config.enabled) return
     scheduleNext(0)
+    if (retry) armRetryTimer(Math.max(0, retry.nextAt - Date.now()))
   }
 
   function stopPolling() {
@@ -393,6 +493,8 @@ export function createAppServer(options = {}) {
     timer = null
     nextPollAt = 0
     pending = null
+    if (retryTimer) clearTimeout(retryTimer)
+    retryTimer = null
     try {
       pipeline.abort?.()
     } catch {
@@ -416,9 +518,11 @@ export function createAppServer(options = {}) {
     config = next
     const outputChanged = previousOutput !== config.outputDir
     if (outputChanged) {
+      clearRetryState({ notify: false })
       paths = configPaths(config)
       ensureLayout(paths)
       state = loadState(paths.statePath)
+      retry = readRetry(retryPath())
     }
     engine = engineConfig(config)
     if (!busy && !options.pipeline) freshPipeline()
@@ -452,6 +556,41 @@ export function createAppServer(options = {}) {
     }
     if (req.method === 'GET' && path === '/api/logs') {
       return json(res, 200, { ok: true, logs: hub.getLogs() })
+    }
+    if (req.method === 'GET' && path === '/api/retry') {
+      return json(res, 200, { ok: true, retry: statusSnapshot().retry })
+    }
+    if (req.method === 'POST' && path === '/api/retry') {
+      const body = await readJsonBody(req)
+      const action = String(body.action ?? 'now')
+      if (action === 'clear') {
+        clearRetryState()
+        return json(res, 200, { ok: true, retry: null })
+      }
+      if (action !== 'now') return errorJson(res, 400, '未知 retry action', 'BAD_ACTION')
+      if (!retry) return errorJson(res, 400, '没有待重试任务', 'NO_RETRY')
+      if (busy) return errorJson(res, 409, '已有任务正在运行', 'BUSY')
+      const observation = retry.observation
+      if (retryTimer) clearTimeout(retryTimer)
+      retryTimer = null
+      runRetry().catch((error) => {
+        lastError = String(error?.message ?? error)
+        emit({ type: 'error', scope: 'retry', message: lastError, at: Date.now() })
+      })
+      return json(res, 200, { ok: true, retry: statusSnapshot().retry, title: observation.title })
+    }
+    if (req.method === 'GET' && path === '/api/browser') {
+      const diagnostics = await browserDiagnostics(engine)
+      return json(res, 200, {
+        ok: true,
+        ...diagnostics,
+        lastSource: currentObservation?.source ?? null,
+        lastTitle: currentObservation?.title ?? '',
+      })
+    }
+    if (req.method === 'POST' && path === '/api/browser/probe') {
+      const result = await probeBrowser(engine)
+      return json(res, 200, { ok: result.ok, ...result })
     }
     if (req.method === 'GET' && path === '/api/autostart') {
       return json(res, 200, { ok: true, autostart: autostartStatus() })
@@ -705,6 +844,8 @@ export function createAppServer(options = {}) {
     shuttingDown = true
     if (timer) clearTimeout(timer)
     timer = null
+    if (retryTimer) clearTimeout(retryTimer)
+    retryTimer = null
     try {
       pipeline.abort?.()
     } catch {

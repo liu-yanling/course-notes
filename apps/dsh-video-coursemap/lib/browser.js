@@ -47,12 +47,16 @@ const BROWSER_APPS = new Set([
   'Safari',
   'Firefox',
   'Tabbit Browser',
+  'Tabbit浏览器',
+  'Tabbit 浏览器',
+  '谷歌浏览器',
   '哔哩哔哩',
   'Bilibili',
 ])
 
 const CHROMIUM_APPS = {
   'Google Chrome': { root: 'Google/Chrome', label: 'Chrome' },
+  '谷歌浏览器': { root: 'Google/Chrome', label: 'Chrome' },
   Chromium: { root: 'Chromium', label: 'Chromium' },
   'Microsoft Edge': { root: 'Microsoft Edge', label: 'Edge' },
   'Brave Browser': { root: 'BraveSoftware/Brave-Browser', label: 'Brave' },
@@ -66,7 +70,10 @@ const APPLESCRIPT_APPS = {
   'Brave Browser': 'Brave Browser',
   Arc: 'Arc',
   Safari: 'Safari',
+  '谷歌浏览器': 'Google Chrome',
 }
+
+const TABBIT_NAMES = new Set(['Tabbit Browser', 'Tabbit浏览器', 'Tabbit 浏览器'])
 
 let frontCache = { at: 0, name: '' }
 const appleScriptFailures = new Map()
@@ -91,8 +98,12 @@ export async function frontmostApp({ force = false, now = Date.now() } = {}) {
   }
 }
 
+export function isTabbitApp(name) {
+  return TABBIT_NAMES.has(String(name ?? '').trim())
+}
+
 export function isBrowserApp(name) {
-  return BROWSER_APPS.has(String(name ?? '').trim())
+  return BROWSER_APPS.has(String(name ?? '').trim()) || isTabbitApp(name)
 }
 
 export function chromiumVendorFor(appName) {
@@ -281,11 +292,51 @@ export async function detectAppleScript({ appName, now = Date.now() } = {}) {
       : `tell application "${target}" to get {title, URL} of active tab of front window`
   try {
     const { stdout } = await execFileP('/usr/bin/osascript', ['-e', script], { timeout: 6000 })
+    appleScriptFailures.delete(appName)
     return parseAppleScriptResult(stdout)
   } catch {
     appleScriptFailures.set(appName, now)
     return null
   }
+}
+
+/** Try AppleScript once for a permission probe; does not cache failures. */
+export async function probeAppleScript({ appName, now = Date.now() } = {}) {
+  const target = APPLESCRIPT_APPS[String(appName ?? '').trim()]
+  if (!target) return { ok: false, error: '当前应用不支持 AppleScript 读取标签页' }
+  const script =
+    target === 'Safari'
+      ? 'tell application "Safari" to get {name, URL} of current tab of front window'
+      : `tell application "${target}" to get {title, URL} of active tab of front window`
+  try {
+    const { stdout } = await execFileP('/usr/bin/osascript', ['-e', script], { timeout: 6000 })
+    const result = parseAppleScriptResult(stdout)
+    appleScriptFailures.delete(appName)
+    if (!result) return { ok: false, error: '浏览器没有返回当前标签页' }
+    return { ok: true, ...result }
+  } catch (error) {
+    return {
+      ok: false,
+      error: String(error?.stderr ?? error?.message ?? error).trim().slice(0, 300),
+      permissionDenied: /permission|not allowed|10004|automation/i.test(String(error?.stderr ?? error?.message ?? '')),
+    }
+  }
+}
+
+/** One-shot user-facing probe of the active tab. */
+export async function probeBrowser(config) {
+  const front = await frontmostApp({ force: true })
+  if (!isBrowserApp(front)) return { ok: false, frontApp: front, reason: 'not-browser' }
+  if (isTabbitApp(front)) {
+    const tab = await detectTabbit({ task: config.browser.tabbitTask })
+    if (!tab) return { ok: false, frontApp: front, reason: 'tabbit-unavailable' }
+    return { ok: true, frontApp: front, source: 'tabbit', title: tab.title, url: tab.url }
+  }
+  if (chromiumVendorFor(front) || front === 'Safari') {
+    const result = await probeAppleScript({ appName: front })
+    return { ...result, frontApp: front, source: 'applescript' }
+  }
+  return { ok: false, frontApp: front, reason: 'unsupported-browser' }
 }
 
 function normalizeObservation(raw, source) {
@@ -321,7 +372,7 @@ export async function detectOnce(config, options = {}) {
   const appleScript = options.detectAppleScript ?? detectAppleScript
   const detectHistory = options.detectChromium ?? detectChromium
 
-  if (backend === 'tabbit' || (backend === 'auto' && front === 'Tabbit Browser')) {
+  if (backend === 'tabbit' || (backend === 'auto' && isTabbitApp(front))) {
     tries.push('tabbit')
   }
 
@@ -368,6 +419,10 @@ export async function browserDiagnostics(config) {
     frontApp: front || '（未知）',
     isBrowser: isBrowserApp(front),
     backend: config.browser.backend,
+    appleScriptEnabled: config.browser.appleScriptEnabled,
+    supportsAppleScript: Boolean(APPLESCRIPT_APPS[front]),
+    isChromium: Boolean(chromiumVendorFor(front)),
+    isSafari: front === 'Safari',
     tabbitAvailable: existsSync(TABBIT_CLI),
   }
 }
