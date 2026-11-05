@@ -11,7 +11,8 @@
     "shortcut": "node scripts/install-desktop-shortcut.mjs",
     "build:app": "node scripts/install-desktop-shortcut.mjs --dry-run",
     "test:e2e": "playwright test",
-    "test:all": "npm test && npm run test:e2e"
+    "test:all": "npm test && npm run test:e2e",
+    "smoke:app": "node scripts/smoke-app.mjs \"dist/build/Course Notes.app\""
   },
   "license": "MIT",
   "repository": {

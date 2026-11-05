@@ -67,6 +67,9 @@ jobs:
           unzip -l "dist/course-notes-$VERSION.zip" | head -12
           codesign -dv "dist/build/Course Notes.app" 2>&1 | head -8
 
+      - name: Smoke-test the built macOS app
+        run: node scripts/smoke-app.mjs "dist/build/Course Notes.app"
+
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
