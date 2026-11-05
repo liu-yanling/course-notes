@@ -43,6 +43,8 @@ The source is MIT-licensed. Binary beta builds are published in
 
 ![course notes Web MVP](docs/course-notes-web.png)
 
+Live: **https://course-notes-web.onrender.com**
+
 A separate, stateless web edition: paste a Bilibili URL, get a Markdown note
 and Word download. No browser detection, no local files, no accounts.
 

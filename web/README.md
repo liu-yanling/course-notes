@@ -39,6 +39,10 @@ The DeepSeek key is entered by the user in the browser, sent only to this
 server for that request, and never logged or persisted. Without a key the app
 uses deterministic local extraction.
 
+## Live deployment
+
+https://course-notes-web.onrender.com
+
 ## Deploy on Render
 
 The repository includes:
