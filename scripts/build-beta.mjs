@@ -18,6 +18,7 @@ import {
   mkdirSync,
   readFileSync,
   readdirSync,
+  realpathSync,
   rmSync,
   symlinkSync,
   writeFileSync,
@@ -67,7 +68,7 @@ function findNode() {
     if (candidate && candidate.includes('/') && existsSync(candidate)) {
       try {
         const result = run(candidate, ['--version'], { timeoutMs: 10000 })
-        if (result.status === 0) return candidate
+        if (result.status === 0) return realpathSync(candidate)
       } catch {
         /* next */
       }
@@ -89,7 +90,7 @@ function findPython() {
     const bin = join(candidate, 'bin', 'python3')
     if (!existsSync(bin)) continue
     const result = run(bin, ['-c', 'import docx; print("ok")'], { timeoutMs: 20000 })
-    if (result.status === 0) return candidate
+    if (result.status === 0) return realpathSync(candidate)
   }
   throw new Error('找不到带 python-docx 的 Python 运行时')
 }
