@@ -601,9 +601,17 @@ export function createAppServer(options = {}) {
     return /^(127\.0\.0\.1|localhost)(:\d+)?$/.test(host)
   }
 
+  function originAllowed(req) {
+    const origin = String(req.headers.origin ?? '')
+    if (!origin) return true
+    const host = String(req.headers.host ?? '')
+    return origin === 'http://' + host || origin === 'https://' + host
+  }
+
   async function handle(req, res) {
     try {
       if (!hostAllowed(req)) return errorJson(res, 403, '仅允许本机访问', 'FORBIDDEN')
+      if (!originAllowed(req)) return errorJson(res, 403, '跨站请求已拒绝', 'CSRF')
       const url = new URL(req.url ?? '/', 'http://127.0.0.1')
       if (url.pathname === '/api/events') {
         return hub.subscribe(req, res)

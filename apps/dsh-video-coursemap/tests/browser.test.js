@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { parseTabbitInventory, parseAppleScriptResult, isBrowserApp, chromiumVendorFor } from '../lib/browser.js'
+import { detectOnce, parseTabbitInventory, parseAppleScriptResult, isBrowserApp, chromiumVendorFor } from '../lib/browser.js'
 
 test('parseTabbitInventory chooses the active tab', () => {
   const stdout = [
@@ -49,4 +49,28 @@ test('browser app maps', () => {
   assert.equal(isBrowserApp('Finder'), false)
   assert.equal(chromiumVendorFor('Google Chrome').label, 'Chrome')
   assert.equal(chromiumVendorFor('Safari'), null)
+})
+
+
+test('detectOnce prefers exact AppleScript over Chromium History', async () => {
+  let historyCalled = false
+  const config = { browser: { backend: 'auto', appleScriptEnabled: true, chromeRecencyMinutes: 30, tabbitTask: 'x' } }
+  const result = await detectOnce(config, {
+    front: 'Google Chrome',
+    detectAppleScript: async () => ({ title: '当前课程', url: 'https://www.bilibili.com/video/BV1otokBpENn' }),
+    detectChromium: async () => { historyCalled = true; return null },
+  })
+  assert.equal(result.source, 'applescript')
+  assert.equal(historyCalled, false)
+})
+
+test('detectOnce falls back to Chromium History when AppleScript is denied', async () => {
+  const config = { browser: { backend: 'auto', appleScriptEnabled: true, chromeRecencyMinutes: 30, tabbitTask: 'x' } }
+  const result = await detectOnce(config, {
+    front: 'Google Chrome',
+    detectAppleScript: async () => null,
+    detectChromium: async () => ({ title: '历史课程', url: 'https://www.bilibili.com/video/BV1owrpYKEtP', profile: 'Default', visitedAt: Date.now() }),
+  })
+  assert.equal(result.source, 'chromium-history')
+  assert.match(result.url, /BV1owrpYKEtP/)
 })

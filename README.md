@@ -18,7 +18,7 @@ agent runtime running.
 
 ## Features
 
-- **Automatic detection** — watches Chrome, Safari or Tabbit for a Bilibili course.
+- **Automatic detection** — exact current-tab first (AppleScript/Tabbit), with Chrome History only as a permission-denied fallback.
 - **Streaming summary** — classify → fetch → summarize → Word, with live progress.
 - **Knowledge map** — notes are grouped by subject and merged into a study manual.
 - **Word output** — .docx video note, subject manual, course overview.
@@ -135,6 +135,7 @@ provides the menu-bar controls. Login-at-startup uses a per-user LaunchAgent
   [SECURITY.md](SECURITY.md).
 - Do not commit config.json, server/config.json, runtime files or the
   课程知识地图 output directory.
+- The local HTTP server rejects cross-origin browser requests and binds to 127.0.0.1.
 
 ## Releases
 
@@ -153,7 +154,7 @@ installation notes.
 npm test
 ~~~
 
-This runs 20 backend tests and 39 engine tests. The engine tests also exercise
+This runs 20 backend tests and 41 engine tests. The engine tests also exercise
 the Python/docx bridge when a compatible interpreter is available.
 
 ## Relationship to DeepSeek Harness

@@ -14,7 +14,7 @@ Do not include API keys, Keychain contents or personal data in reports.
 
 ## Local security model
 
-- The HTTP server binds to 127.0.0.1 only.
+- The HTTP server binds to 127.0.0.1 only and rejects cross-origin browser requests.
 - Videos are not uploaded; only text needed for summarization goes to the
   configured LLM.
 - API keys are stored in macOS Keychain when available.

@@ -31,6 +31,12 @@ test('server exposes health, status, history and static page', async () => {
     assert.match(await page.text(), /course notes/)
     const badDoc = await fetch('http://127.0.0.1:' + port + '/api/doc?path=' + encodeURIComponent('../server/config.json'))
     assert.equal(badDoc.status, 400)
+    const crossOrigin = await fetch('http://127.0.0.1:' + port + '/api/control', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Origin: 'https://evil.example' },
+      body: JSON.stringify({ action: 'start' }),
+    })
+    assert.equal(crossOrigin.status, 403)
     const badOpen = await fetch('http://127.0.0.1:' + port + '/api/open', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

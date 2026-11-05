@@ -317,18 +317,25 @@ export async function detectOnce(config, options = {}) {
   if (!front || !isBrowserApp(front)) return null
   const backend = config.browser.backend
   const tries = []
+  const chromium = chromiumVendorFor(front)
+  const appleScript = options.detectAppleScript ?? detectAppleScript
+  const detectHistory = options.detectChromium ?? detectChromium
 
   if (backend === 'tabbit' || (backend === 'auto' && front === 'Tabbit Browser')) {
     tries.push('tabbit')
   }
-  if (backend === 'chromium' || (backend === 'auto' && chromiumVendorFor(front))) {
-    tries.push('chromium')
-  }
+
+  // Exact current tab first. Chrome's History is only a fallback: it can
+  // easily return the previous video while the user has already switched.
   if (
     backend === 'applescript' ||
-    (backend === 'auto' && config.browser.appleScriptEnabled)
+    (backend === 'auto' && config.browser.appleScriptEnabled && (chromium || front === 'Safari'))
   ) {
     tries.push('applescript')
+  }
+
+  if (backend === 'chromium' || (backend === 'auto' && chromium)) {
+    tries.push('chromium')
   }
 
   for (const kind of tries) {
@@ -337,7 +344,7 @@ export async function detectOnce(config, options = {}) {
       const observation = normalizeObservation({ ...tab, app: front }, 'tabbit')
       if (observation) return observation
     } else if (kind === 'chromium') {
-      const row = await detectChromium({
+      const row = await detectHistory({
         appName: front,
         now,
         recencyMinutes: config.browser.chromeRecencyMinutes,
@@ -345,7 +352,7 @@ export async function detectOnce(config, options = {}) {
       const observation = normalizeObservation({ ...row, app: front }, 'chromium-history')
       if (observation) return observation
     } else if (kind === 'applescript') {
-      const result = await detectAppleScript({ appName: front, now })
+      const result = await appleScript({ appName: front, now })
       const observation = normalizeObservation({ ...result, app: front }, 'applescript')
       if (observation) return observation
     }

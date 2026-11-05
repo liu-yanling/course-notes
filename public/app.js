@@ -107,7 +107,7 @@
       'llmKeyStatus', 'btnTestLlm', 'btnShortcut', 'shortcutStatus', 'btnShutdown',
       'outputDir', 'btnSaveSettings', 'toast', 'footerPort', 'setDataDir', 'notifyOnComplete',
       'updateCurrent', 'updateStatus', 'btnCheckUpdate', 'updateDownload', 'updateUrl',
-      'autostart', 'autostartStatus',
+      'autostart', 'autostartStatus', 'browserHint', 'btnBrowserPermission',
       'onboarding', 'onboardStep1', 'onboardStep2', 'onboardStep3', 'onboardDataDir',
       'onboardNext1', 'onboardProvider', 'onboardKey', 'onboardSaveKey', 'onboardKeyStatus',
       'onboardSkipLlm', 'onboardNext2', 'onboardOpenPrivacy', 'onboardFinish', 'onboardSkipAll'
@@ -151,6 +151,10 @@
     els.btnSaveSettings.addEventListener('click', saveSettings);
     els.btnTestLlm.addEventListener('click', testLlm);
     els.btnCheckUpdate.addEventListener('click', checkUpdate);
+    els.btnBrowserPermission.addEventListener('click', function () {
+      postJson('/api/open-url', { url: 'x-apple.systempreferences:com.apple.preference.security?Privacy_Automation' })
+        .catch(function (error) { toast(error.message, 'error'); });
+    });
     els.autostart.addEventListener('change', async function () {
       var enabled = els.autostart.checked;
       els.autostart.disabled = true;
@@ -818,7 +822,8 @@
       els.currentUrl.hidden = true;
       els.currentUrl.removeAttribute('href');
     }
-    els.currentSource.textContent = '来源：' + (current.source || '—');
+    els.currentSource.textContent = '来源：' + sourceLabel(current.source);
+    updateBrowserHint(current.source);
     els.currentTime.textContent = '最后观察：' + (current.at ? formatClock(current.at) : '—');
 
     var seconds = Math.round((status.pollIntervalMs || 15000) / 1000);
@@ -839,6 +844,27 @@
       els.sidebarDot.className = 'dot ' + (!connected ? 'offline' : working ? 'working' : enabled ? 'running' : 'paused');
     }
     tickCountdown();
+  }
+
+  function sourceLabel(source) {
+    if (source === 'applescript') return '当前标签页';
+    if (source === 'chromium-history') return 'Chrome 历史（近似）';
+    if (source === 'tabbit') return 'Tabbit 当前标签页';
+    if (source === 'manual') return '手动 URL';
+    return source || '—';
+  }
+
+  function updateBrowserHint(source) {
+    if (!els.browserHint) return;
+    if (source === 'chromium-history') {
+      els.browserHint.textContent = 'Chrome 当前标签页权限未开启，正在使用历史记录近似。打开系统设置 → 隐私与安全性 → 自动化，允许 course notes 控制 Google Chrome。';
+    } else if (source === 'applescript') {
+      els.browserHint.textContent = '已使用浏览器当前标签页，识别是精确的。';
+    } else if (source === 'tabbit') {
+      els.browserHint.textContent = '正在通过 Tabbit 当前标签页识别。';
+    } else {
+      els.browserHint.textContent = 'Chrome/Safari 优先读取当前标签页；权限被拒时回退到 Chrome 历史。';
+    }
   }
 
   function tickCountdown() {
