@@ -47,7 +47,7 @@ jobs:
         run: |
           uv python install 3.12
           PYTHON="$(uv python find 3.12)"
-          uv pip install --python "$PYTHON" python-docx
+          uv pip install --python "$PYTHON" --break-system-packages python-docx
           echo "COURSE_NOTES_PYTHON=$PYTHON" >> "$GITHUB_ENV"
           echo "COURSE_NOTES_PYTHON_ROOT=$(dirname "$(dirname "$PYTHON")")" >> "$GITHUB_ENV"
           "$PYTHON" -c 'import docx; print("python-docx", docx.__version__)'
