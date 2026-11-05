@@ -27,7 +27,7 @@ agent runtime running.
 - **macOS Keychain** — API keys are stored in Keychain instead of plain config when available.
 - **Menu bar helper** — open the app, poll now, pause, open notes, launch at login.
 - **Update check** — reads a configurable version.json manifest.
-- **Website** — landing page, privacy policy and terms in [site/](site/).
+- **Website** — [liu-yanling.github.io/course-notes](https://liu-yanling.github.io/course-notes/); source in [site/](site/).
 
 ## Status
 
