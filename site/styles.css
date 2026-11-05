@@ -71,6 +71,8 @@ main { overflow: hidden; }
 .screen-copy ul { margin: 18px 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 9px; }
 .screen-copy li { font-size: 11.5px; color: #555046; padding-left: 18px; position: relative; }
 .screen-copy li::before { content: "·"; position: absolute; left: 0; color: var(--accent); font-size: 20px; line-height: 13px; }
+.screen-copy .btn { margin-top: 20px; }
+.web-band { padding-top: 60px; }
 .screen-image { position: relative; }
 .screen-image img { border: 1px solid var(--line); border-radius: 14px; box-shadow: 0 22px 60px rgba(60, 48, 30, .14); }
 .screen-image span { position: absolute; left: 18px; bottom: -13px; background: white; border: 1px solid var(--line); border-radius: 999px; padding: 7px 12px; font-size: 9.5px; color: var(--muted); }
