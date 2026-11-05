@@ -1,0 +1,46 @@
+course notes {{VERSION}} · beta
+
+## Install
+
+1. Unzip this archive.
+2. Drag "Course Notes.app" into Applications (or any folder).
+3. First launch: if macOS says the developer cannot be verified,
+   right-click the app -> Open, or run:
+   xattr -dr com.apple.quarantine "/Applications/Course Notes.app"
+4. This build is ad-hoc signed and not notarized. Internal/beta use only.
+
+## First run
+
+1. Choose a data folder (default: ~/Documents/course notes).
+2. Add your own DeepSeek API key (stored in macOS Keychain), or choose
+   local extraction / Ollama.
+3. Allow Automation access when Chrome or Safari is first read.
+
+## Use
+
+1. Open a Bilibili course in Chrome/Safari and keep it in front.
+2. Wait 15-30 seconds for the live summary.
+3. Word notes are written under:
+   <data folder>/课程知识地图/视频笔记
+
+## Menu bar
+
+- course notes adds a menu-bar helper: open app, poll now, pause,
+  open notes, launch at login.
+- Login-at-startup can be enabled in Settings -> Data & Desktop.
+- If the login item cannot be written, move the app to Applications and
+  launch it from Finder, then retry.
+
+## Update check
+
+Settings -> About & Updates -> Check for updates. A version.json needs:
+version / downloadUrl / notes.
+
+## Limitations
+
+- Apple Silicon macOS 12+.
+- Not notarized; Gatekeeper may require right-click Open.
+- Chrome detection may fall back to History approximation.
+- No subtitles: summary uses description, pages, tags, danmaku and comments.
+
+Not notarized. Do not redistribute this build as an official release.

@@ -36,7 +36,7 @@ const resources = join(contents, 'Resources')
 const appCode = join(resources, 'app')
 const runtimeDir = join(resources, 'runtime')
 const pythonDir = join(resources, 'python')
-const version = '1.0.0-beta.1'
+const version = String(process.env.COURSE_NOTES_VERSION || '1.0.0-beta.1').trim()
 
 function log(message) {
   console.log('[build-beta] ' + message)
@@ -224,25 +224,15 @@ function signAdHoc() {
 function buildDmg() {
   const dmgPath = join(dist, 'course-notes-' + version + '.dmg')
   const staging = join(dist, 'dmg-staging')
+  const instructions = existsSync(join(root, 'INSTALL.txt'))
+    ? readFileSync(join(root, 'INSTALL.txt'), 'utf8').replace(/\{\{VERSION\}\}/g, version)
+    : 'course notes ' + version + ' beta\n\nRight-click Open on first launch. Not notarized.\n'
   rmSync(staging, { recursive: true, force: true })
   mkdirSync(staging, { recursive: true })
   cpSync(appPath, join(staging, 'Course Notes.app'), { recursive: true })
   symlinkSync('/Applications', join(staging, 'Applications'))
-  writeFileSync(
-    join(staging, '安装说明.txt'),
-    [
-      'course notes ' + version + ' 内测版',
-      '',
-      '1. 把 Course Notes.app 拖到 Applications（或直接双击运行）。',
-      '2. 如果 macOS 提示“无法验证开发者”：右键 app → 打开 → 仍要打开。',
-      '3. 首次启动选择数据目录、填写 DeepSeek Key（或选择本地提取）。',
-      '4. 在 Chrome/Safari 打开 B 站课程，保持前台。',
-      '',
-      '此包未使用 Developer ID 签名/公证，仅供内部测试。',
-      '',
-    ].join('\n'),
-    'utf8',
-  )
+  writeFileSync(join(staging, 'INSTALL.txt'), instructions, 'utf8')
+
   let producedDmg = ''
   const result = run(
     '/usr/bin/hdiutil',
@@ -257,14 +247,22 @@ function buildDmg() {
         String(result.stderr ?? result.stdout ?? '').slice(0, 300),
     )
   }
+
+  const zipStaging = join(dist, 'zip-staging')
+  rmSync(zipStaging, { recursive: true, force: true })
+  mkdirSync(zipStaging, { recursive: true })
+  cpSync(appPath, join(zipStaging, 'Course Notes.app'), { recursive: true })
+  writeFileSync(join(zipStaging, 'INSTALL.txt'), instructions, 'utf8')
   const zipPath = join(dist, 'course-notes-' + version + '.zip')
   const zipResult = run(
     '/usr/bin/ditto',
-    ['-c', '-k', '--sequesterRsrc', '--keepParent', staging, zipPath],
+    ['-c', '-k', '--sequesterRsrc', zipStaging, zipPath],
     { timeoutMs: 300000 },
   )
   if (zipResult.status !== 0) {
     console.warn('[build-beta] zip failed:', String(zipResult.stderr ?? '').slice(0, 300))
+  } else {
+    run('/usr/bin/zip', ['-d', zipPath, '__MACOSX/*'], { timeoutMs: 30000 })
   }
   return { dmgPath: producedDmg, zipPath }
 }

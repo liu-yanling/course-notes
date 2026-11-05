@@ -1,0 +1,86 @@
+name: release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version without v prefix, e.g. 1.0.0-beta.2"
+        required: true
+        default: "1.0.0-beta.2"
+      publish:
+        description: "Create a GitHub release (otherwise upload artifact only)"
+        required: false
+        default: "false"
+
+permissions:
+  contents: write
+
+jobs:
+  build-macos:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Set version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            VERSION="${{ inputs.version }}"
+          else
+            VERSION="${GITHUB_REF_NAME#v}"
+          fi
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+          echo "Building course notes $VERSION"
+
+      - name: Install relocatable Python
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: "latest"
+
+      - name: Prepare Python runtime
+        run: |
+          uv python install 3.12
+          PYTHON="$(uv python find 3.12)"
+          uv pip install --python "$PYTHON" python-docx
+          echo "COURSE_NOTES_PYTHON=$PYTHON" >> "$GITHUB_ENV"
+          echo "COURSE_NOTES_PYTHON_ROOT=$(dirname "$(dirname "$PYTHON")")" >> "$GITHUB_ENV"
+          "$PYTHON" -c 'import docx; print("python-docx", docx.__version__)'
+
+      - name: Run tests
+        env:
+          COURSE_NOTES_PYTHON: ${{ env.COURSE_NOTES_PYTHON }}
+        run: npm test
+
+      - name: Build app and zip
+        env:
+          COURSE_NOTES_VERSION: ${{ env.VERSION }}
+        run: |
+          export COURSE_NOTES_NODE="$(command -v node)"
+          node scripts/build-beta.mjs
+          ls -lh "dist/course-notes-$VERSION.zip"
+          unzip -l "dist/course-notes-$VERSION.zip" | head -12
+          codesign -dv "dist/build/Course Notes.app" 2>&1 | head -8
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: course-notes-${{ env.VERSION }}
+          path: dist/course-notes-${{ env.VERSION }}.zip
+          if-no-files-found: error
+
+      - name: Publish GitHub release
+        if: github.event_name == 'push' || inputs.publish == 'true'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/course-notes-${{ env.VERSION }}.zip
+          tag_name: v${{ env.VERSION }}
+          target_commitish: main
+          prerelease: ${{ contains(env.VERSION, 'beta') }}
+          generate_release_notes: true
+          fail_on_unmatched_files: true

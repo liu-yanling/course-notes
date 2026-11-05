@@ -136,6 +136,17 @@ provides the menu-bar controls. Login-at-startup uses a per-user LaunchAgent
 - Do not commit config.json, server/config.json, runtime files or the
   课程知识地图 output directory.
 
+## Releases
+
+Tagging a commit with v* triggers .github/workflows/release.yml. The workflow
+runs the tests, downloads a relocatable Python, builds a self-contained macOS
+app (bundled Node + Python), uploads the zip as an artifact, and publishes a
+GitHub Release. It can also be run manually from the Actions tab with
+workflow_dispatch (publish=false by default).
+
+The build is ad-hoc signed and not notarized. See INSTALL.txt for end-user
+installation notes.
+
 ## Testing
 
 ~~~sh
