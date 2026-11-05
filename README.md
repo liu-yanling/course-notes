@@ -26,7 +26,8 @@ agent runtime running.
 - **Bring your own key** — DeepSeek API, local Ollama, or a deterministic local extractor.
 - **macOS Keychain** — API keys are stored in Keychain instead of plain config when available.
 - **Menu bar helper** — open the app, poll now, pause, open notes, launch at login.
-- **Update check** — reads a configurable version.json manifest.
+- **Update check** — reads a configurable version.json manifest with SHA-256.
+- **One-click update** — downloads, verifies, replaces the app with a backup, and relaunches.
 - **Retry & recovery** — failed tasks persist with backoff and can be retried manually after a restart.
 - **Permission probe** — test the active Chrome/Safari/Tabbit tab and jump to macOS Automation settings.
 - **Website** — [liu-yanling.github.io/course-notes](https://liu-yanling.github.io/course-notes/); source in [site/](site/).
@@ -156,7 +157,7 @@ installation notes.
 npm test
 ~~~
 
-This runs 24 backend tests and 42 engine tests. The engine tests also exercise
+This runs 25 backend tests and 42 engine tests. The engine tests also exercise
 the Python/docx bridge when a compatible interpreter is available.
 
 End-to-end UI tests (Playwright):

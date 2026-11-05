@@ -52,6 +52,7 @@ export async function checkForUpdate({
       latestVersion,
       updateAvailable,
       downloadUrl: String(data.downloadUrl ?? '').trim(),
+      sha256: String(data.sha256 ?? '').trim(),
       notes: String(data.notes ?? '').trim(),
       publishedAt: data.publishedAt ?? null,
     }

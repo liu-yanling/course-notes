@@ -7,6 +7,7 @@ import { extname, join, basename } from 'node:path'
 import { spawn } from 'node:child_process'
 
 import {
+  DATA_HOME,
   LOG_PATH,
   PUBLIC_DIR,
   RUNTIME_PATH,
@@ -40,6 +41,7 @@ import { keyStatus, listOllamaModels, testLlm } from './llm.mjs'
 import { deleteKeychainKey, setKeychainKey } from './keychain.mjs'
 import { notifyComplete } from './notify.mjs'
 import { checkForUpdate } from './update.mjs'
+import { downloadAndStageUpdate, startInstaller, writeInstaller } from './updater.mjs'
 import { clearRetry, readRetry, retryDelay, writeRetry, MAX_RETRY_ATTEMPTS } from './retry.mjs'
 import { autostartStatus, installAutostart, removeAutostart } from './autostart.mjs'
 import { desktopShortcutStatus, installDesktopShortcut } from './shortcut.mjs'
@@ -587,6 +589,34 @@ export function createAppServer(options = {}) {
         lastSource: currentObservation?.source ?? null,
         lastTitle: currentObservation?.title ?? '',
       })
+    }
+    if (req.method === 'POST' && path === '/api/update/install') {
+      if (busy) return errorJson(res, 409, '任务进行中，暂不安装更新', 'BUSY')
+      const appPath = String(process.env.COURSE_NOTES_APP_PATH ?? '').trim()
+      if (!appPath) return errorJson(res, 400, '当前不是 .app 安装环境，无法自动安装更新', 'NOT_APP_BUNDLE')
+      try {
+        const staged = await downloadAndStageUpdate({
+          currentVersion: VERSION,
+          updateUrl: config.updateUrl,
+          dataHome: DATA_HOME,
+        })
+        const installer = writeInstaller({
+          appPath,
+          stagedApp: staged.stagedApp,
+          version: staged.version,
+          dataHome: DATA_HOME,
+        })
+        startInstaller(installer)
+        setTimeout(() => close(), 900)
+        return json(res, 200, {
+          ok: true,
+          version: staged.version,
+          restarting: true,
+          logPath: installer.logPath,
+        })
+      } catch (error) {
+        return errorJson(res, 500, String(error?.message ?? error), 'UPDATE_INSTALL_FAILED')
+      }
     }
     if (req.method === 'POST' && path === '/api/browser/probe') {
       const result = await probeBrowser(engine)

@@ -107,7 +107,7 @@
       'llmProvider', 'llmModel', 'llmBaseUrl', 'llmApiKey',
       'llmKeyStatus', 'btnTestLlm', 'btnShortcut', 'shortcutStatus', 'btnShutdown',
       'outputDir', 'btnSaveSettings', 'toast', 'footerPort', 'setDataDir', 'notifyOnComplete',
-      'updateCurrent', 'updateStatus', 'btnCheckUpdate', 'updateDownload', 'updateUrl',
+      'updateCurrent', 'updateStatus', 'btnCheckUpdate', 'updateDownload', 'btnInstallUpdate', 'updateUrl',
       'autostart', 'autostartStatus', 'browserHint', 'btnBrowserPermission', 'btnProbeBrowser',
       'onboarding', 'onboardStep1', 'onboardStep2', 'onboardStep3', 'onboardDataDir',
       'onboardNext1', 'onboardProvider', 'onboardKey', 'onboardSaveKey', 'onboardKeyStatus',
@@ -207,6 +207,21 @@
         toast(error.message, 'error');
       } finally {
         els.autostart.disabled = false;
+      }
+    });
+    els.btnInstallUpdate.addEventListener('click', async function () {
+      if (!state.update || !state.update.updateAvailable) return;
+      if (!window.confirm('将下载 v' + state.update.latestVersion + ' 并重启 course notes，是否继续？')) return;
+      els.btnInstallUpdate.disabled = true;
+      els.updateStatus.textContent = '正在下载并校验更新…';
+      try {
+        await postJson('/api/update/install', {});
+        els.updateStatus.textContent = '更新已下载，正在重启…';
+        toast('更新已下载，应用即将重启', 'success');
+      } catch (error) {
+        els.updateStatus.textContent = error.message;
+        toast(error.message, 'error');
+        els.btnInstallUpdate.disabled = false;
       }
     });
     els.updateDownload.addEventListener('click', function () {
@@ -620,6 +635,7 @@
       if (data.updateAvailable) {
         els.updateStatus.textContent = '发现新版本 v' + data.latestVersion + (data.notes ? '：' + data.notes : '');
         els.updateDownload.hidden = !data.downloadUrl;
+        els.btnInstallUpdate.hidden = !data.downloadUrl;
         toast('发现 course notes 新版本 v' + data.latestVersion, 'success');
       } else {
         els.updateStatus.textContent = '已是最新版本 v' + data.currentVersion;
