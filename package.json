@@ -9,14 +9,16 @@
     "serve": "node server/index.mjs",
     "test": "node --test 'server/tests/*.test.mjs' && node --test 'apps/dsh-video-coursemap/tests/*.test.js'",
     "shortcut": "node scripts/install-desktop-shortcut.mjs",
-    "build:app": "node scripts/install-desktop-shortcut.mjs --dry-run"
+    "build:app": "node scripts/install-desktop-shortcut.mjs --dry-run",
+    "test:e2e": "playwright test",
+    "test:all": "npm test && npm run test:e2e"
   },
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/liu-yanling/course-notes.git"
   },
-  "homepage": "https://github.com/liu-yanling/course-notes",
+  "homepage": "https://liu-yanling.github.io/course-notes/",
   "bugs": {
     "url": "https://github.com/liu-yanling/course-notes/issues"
   },
@@ -30,5 +32,8 @@
     "macos",
     "deepseek",
     "word"
-  ]
+  ],
+  "devDependencies": {
+    "@playwright/test": "^1.50.1"
+  }
 }

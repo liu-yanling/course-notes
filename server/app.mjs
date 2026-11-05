@@ -44,7 +44,7 @@ import { clearRetry, readRetry, retryDelay, writeRetry, MAX_RETRY_ATTEMPTS } fro
 import { autostartStatus, installAutostart, removeAutostart } from './autostart.mjs'
 import { desktopShortcutStatus, installDesktopShortcut } from './shortcut.mjs'
 
-export const VERSION = '1.0.0'
+export const VERSION = String(process.env.COURSE_NOTES_VERSION || '1.0.0').trim()
 const PORTS = [43110, 43111, 43112, 43113, 43114, 43115, 43116, 43117, 43118, 43119]
 
 const MIME = {

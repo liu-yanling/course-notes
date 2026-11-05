@@ -47,3 +47,7 @@ docs/课程助手界面.png
 docs/课程助手设置.png
 docs/演示脚本.md
 docs/验收清单.md
+
+test-results/
+playwright-report/
+blob-report/

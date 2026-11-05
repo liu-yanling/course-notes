@@ -159,6 +159,15 @@ npm test
 This runs 24 backend tests and 42 engine tests. The engine tests also exercise
 the Python/docx bridge when a compatible interpreter is available.
 
+End-to-end UI tests (Playwright):
+
+~~~sh
+# local: use installed Chrome, or install Playwright Chromium
+PLAYWRIGHT_CHANNEL=chrome npm run test:e2e
+
+# CI: npm ci && npx playwright install --with-deps chromium && npm run test:e2e
+~~~
+
 ## Relationship to DeepSeek Harness
 
 The standalone app reuses the pure Node engine under

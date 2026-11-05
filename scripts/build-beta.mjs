@@ -150,6 +150,7 @@ NODE="$RES/runtime/node"
 export COURSE_NOTES_DATA_DIR="\${COURSE_NOTES_DATA_DIR:-$HOME/Documents/course notes}"
 export COURSE_NOTES_PYTHON="$RES/python/bin/python3"
 export COURSE_NOTES_APP_PATH="$APP_BUNDLE"
+export COURSE_NOTES_VERSION="${version}"
 MENU="$MACOS/CourseNotesMenu"
 if [ -x "$MENU" ] && ! pgrep -x "CourseNotesMenu" >/dev/null 2>&1; then
   nohup "$MENU" >/dev/null 2>&1 &
