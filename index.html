@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>course notes · 把 B 站课程变成可复习的知识笔记</title>
+<meta name="description" content="course notes 自动检测你正在看的 B 站课程，抓取弹幕评论，生成学科知识地图与 Word 学习笔记。macOS 本地优先。">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="site-nav">
+  <a class="site-brand" href="index.html">
+    <span class="brand-icon">✦</span>
+    <span>course notes</span>
+  </a>
+  <nav>
+    <a href="#features">功能</a>
+    <a href="#how">怎么用</a>
+    <a href="#pricing">价格</a>
+    <a href="#faq">FAQ</a>
+    <a class="nav-download" href="https://github.com/liu-yanling/course-notes/releases/tag/v1.0.0-beta.1">下载内测版</a>
+  </nav>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="hero-copy">
+      <span class="eyebrow">macOS · 本地优先 · 免费内测</span>
+      <h1>把正在看的<br><em>B 站课程</em><br>变成可复习的笔记。</h1>
+      <p class="lead">course notes 自动识别当前课程，抓取简介、分P、弹幕与评论，生成学科知识地图和 Word 学习笔记。不用复制链接，不用一直盯着页面。</p>
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="https://github.com/liu-yanling/course-notes/releases/tag/v1.0.0-beta.1">下载 macOS 内测版</a>
+        <a class="btn btn-quiet" href="#how">看看怎么用</a>
+      </div>
+      <p class="hero-note">Apple Silicon · macOS 12+ · 当前为 ad-hoc 签名内测包</p>
+    </div>
+    <div class="hero-shot">
+      <div class="shot-bar"><span></span><span></span><span></span><b>course notes</b></div>
+      <img src="assets/home.png" alt="course notes 主页截图">
+      <div class="shot-tag">自动检测 · 实时总结 · Word 输出</div>
+    </div>
+  </section>
+
+  <section class="logos">
+    <span>为这些场景设计</span>
+    <b>考研 / 考公</b><b>转行学技能</b><b>大学网课</b><b>技术课程</b><b>知识归档</b>
+  </section>
+
+  <section id="features" class="section">
+    <div class="section-head"><span class="eyebrow">为什么是 course notes</span><h2>不是又一个“粘贴链接”的摘要工具。</h2><p>它更像一个坐在你旁边的课程助教：你打开课，它开始记。</p></div>
+    <div class="feature-grid">
+      <article class="feature feature-wide"><span class="f-icon">◎</span><h3>自动检测正在看的课程</h3><p>Chrome、Safari、Tabbit 当前标签页；识别到 B 站课程后自动开始，不需要复制 URL。</p><div class="mini-ui"><span class="mini-pill">检测器</span><span class="mini-title">Google Chrome · 当前窗口</span><span class="mini-line"></span><span class="mini-line short"></span></div></article>
+      <article class="feature"><span class="f-icon">▤</span><h3>按学科生成知识地图</h3><p>已有学科更新《学习手册》，新学科自动建手册；同一门课越看越完整。</p></article>
+      <article class="feature"><span class="f-icon">✎</span><h3>Word 笔记，能打印能改</h3><p>视频笔记、学科手册、课程总览都是 .docx，适合归档、打印与二次编辑。</p></article>
+      <article class="feature"><span class="f-icon">⌂</span><h3>本地优先</h3><p>笔记与数据留在你的 Mac；只有总结所需的文本会交给你的 LLM，Key 保存到 Keychain。</p></article>
+      <article class="feature"><span class="f-icon">◷</span><h3>后台运行</h3><p>菜单栏常驻，关掉浏览器也能继续；总结完成发系统通知。</p></article>
+    </div>
+  </section>
+
+  <section id="how" class="section how">
+    <div class="section-head"><span class="eyebrow">三步开始</span><h2>打开课程，剩下的交给它。</h2></div>
+    <div class="steps">
+      <div class="step"><span>01</span><h3>安装并启动</h3><p>拖动 Course Notes.app 到 Applications；首次右键打开，完成数据目录与 Key 设置。</p></div>
+      <div class="step"><span>02</span><h3>打开 B 站课程</h3><p>Chrome / Safari 保持前台；允许一次“自动化”权限。没有课程时也可手动粘贴链接。</p></div>
+      <div class="step"><span>03</span><h3>收笔记</h3><p>15–30 秒后页面实时显示总结；Word 自动落到数据目录，菜单栏会通知你。</p></div>
+    </div>
+  </section>
+
+  <section class="section screens">
+    <div class="screen-copy"><span class="eyebrow">学习档案</span><h2>所有课程，最后汇成一张知识地图。</h2><p>视频笔记按学科归档，学习手册持续更新。打开“学习档案”就能按标题、学科或关键词找回。</p><ul><li>视频 / 学科双视图</li><li>Word、Markdown 双格式</li><li>课程总览与复习清单</li></ul></div>
+    <div class="screen-image"><img src="assets/onboarding.png" alt="course notes 首次启动引导"><span>首次启动引导</span></div>
+  </section>
+
+  <section id="pricing" class="section pricing">
+    <div class="price-card">
+      <span class="eyebrow">V1 内测</span>
+      <h2>免费</h2>
+      <p>现在下载，参与内测。没有账号、没有订阅、没有云端上传。</p>
+      <a class="btn btn-primary" href="https://github.com/liu-yanling/course-notes/releases/tag/v1.0.0-beta.1">下载内测版</a>
+      <small>Apple Silicon · 未公证 · 仅供内部测试</small>
+    </div>
+    <div class="price-card muted-card">
+      <span class="eyebrow">V1.1 正式版</span>
+      <h2>¥129 <small>买断</small></h2>
+      <p>签名公证、自动更新、菜单栏/开机自启、更多学科模板。一次购买，长期使用。</p>
+      <a class="btn btn-quiet" href="#faq">了解计划</a>
+      <small>价格与功能以正式发布为准</small>
+    </div>
+  </section>
+
+  <section id="faq" class="section faq">
+    <div class="section-head"><span class="eyebrow">FAQ</span><h2>你可能想问。</h2></div>
+    <details><summary>需要登录吗？会上传我的视频吗？</summary><p>不需要账号。视频、弹幕、评论和笔记留在本机；只有生成总结所需的文本会发给你选择的 LLM（DeepSeek / Ollama / 本地提取）。</p></details>
+    <details><summary>为什么打开时提示“无法验证开发者”？</summary><p>内测包使用 ad-hoc 签名、未做 Apple 公证。右键 app → 打开 → 仍要打开即可；或在终端执行 xattr -dr com.apple.quarantine。</p></details>
+    <details><summary>支持 Windows / Intel Mac 吗？</summary><p>当前只提供 Apple Silicon macOS 版；Windows 与 Intel 版本在规划中，尚未发布。</p></details>
+    <details><summary>没有字幕的视频可以总结吗？</summary><p>可以。会结合简介、分P、标签、弹幕与评论生成结构化笔记；有字幕时信息更完整。</p></details>
+    <details><summary>我的 Key 安全吗？</summary><p>Key 只保存在 macOS Keychain，不写入配置文件、不显示在页面、不进入日志。若 Keychain 不可用，内测版会提示并临时回退到本地配置。</p></details>
+  </section>
+
+  <section class="download-band">
+    <div><span class="eyebrow">开始使用</span><h2>把下一节课，变成你的第一份知识笔记。</h2></div>
+    <a class="btn btn-primary" href="https://github.com/liu-yanling/course-notes/releases/tag/v1.0.0-beta.1">下载 course notes</a>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div><b>course notes</b><span>B 站课程 · 实时知识地图</span></div>
+  <div class="footer-links"><a href="privacy.html">隐私政策</a><a href="terms.html">服务条款</a><a href="mailto:hello@coursenotes.app">联系</a></div>
+  <p>© 2026 course notes. 内测版，功能和价格可能变化。</p>
+</footer>
+</body>
+</html>
